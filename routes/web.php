@@ -21,16 +21,16 @@ Route::middleware('web')->group(function () {
     });
 
     //Book Management
-    Route::post('/book', [BooksController::class, 'store']);
     Route::get('/book', [BooksController::class, 'index']);
+    Route::post('/book', [BooksController::class, 'store']);
     Route::put('/book/{id}', [BooksController::class, 'update']);
     Route::delete('/book/{id}', [BooksController::class, 'destroy']);
 
     //User Management
-    Route::get('/users', [UserController::class, 'index']);  // Get all users
-    Route::post('/users', [UserController::class, 'store']);  // Add user
-    Route::put('/user/{id}', [UserController::class, 'update']); // Update user
-    Route::delete('/user/{id}', [UserController::class, 'destroy']); // Delete user
+    Route::get('/users', [UserController::class, 'index']);  
+    Route::post('/user', [UserController::class, 'store']); 
+    Route::put('/user/{id}', [UserController::class, 'update']);
+    Route::delete('/user/{id}', [UserController::class, 'destroy']);
 
 
     //I don't even knwo, I forgor
