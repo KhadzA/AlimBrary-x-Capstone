@@ -1,7 +1,9 @@
 import { useRouter } from 'next/router';
 import handleLogout from '../auth/logout';
+import useCheckAuth from '../../../helpers/checkAuth';
 
 export default function UserDashboard() {
+  useCheckAuth();
   const router = useRouter();
 
   return (

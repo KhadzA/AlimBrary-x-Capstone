@@ -3,12 +3,14 @@ import axios from 'axios';
 import Link from 'next/link';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
+import useCheckAuth from '../../../helpers/checkAuth';
 
 axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.withCredentials = true;
 axios.defaults.headers.common['X-XSRF-TOKEN'] = Cookies.get('XSRF-TOKEN');
 
 export default function Books() {
+  useCheckAuth();
   const [books, setBooks] = useState([]);
   const router = useRouter();
 

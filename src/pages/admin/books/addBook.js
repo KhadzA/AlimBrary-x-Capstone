@@ -3,11 +3,13 @@ import Link from 'next/link';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useRouter } from 'next/router';
+import useCheckAuth from '../../../helpers/checkAuth';
 
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = 'http://localhost:8000';
 
 export default function AddBook() {
+  useCheckAuth();
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
