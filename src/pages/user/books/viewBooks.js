@@ -1,13 +1,7 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
-import useCheckAuth from '../../../helpers/checkAuth';
-
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.withCredentials = true;
-axios.defaults.headers.common['X-XSRF-TOKEN'] = Cookies.get('XSRF-TOKEN');
+import { fetchBooks } from '../../../helpers/userBookHandler'; 
+import useCheckAuth from '../../../helpers/checkAuth'; 
 
 export default function Books() {
   useCheckAuth();
@@ -16,16 +10,11 @@ export default function Books() {
 
   useEffect(() => {
     const init = async () => {
-      await axios.get('/sanctum/csrf-cookie'); // ⏳ Get CSRF cookie
-      fetchBooks();
+      const data = await fetchBooks();
+      setBooks(data);
     };
     init();
   }, []);
-
-  const fetchBooks = async () => {
-    const res = await axios.get('/book');
-    setBooks(res.data);
-  };
 
   return (
     <div style={{ padding: '2rem' }}>

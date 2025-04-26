@@ -8,7 +8,7 @@ export default function UserDashboard() {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>User Dashboard</h1>
+      <h1>User</h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <button onClick={() => router.push('/user/books/viewBooks')}>
           View Books

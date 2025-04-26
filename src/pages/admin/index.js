@@ -26,7 +26,7 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <h1>Admin Dashboard</h1>
+      <h1>Admin</h1>
       <button onClick={() => handleRedirect('/admin/books/addBook')}>Add Book</button>
       <br /><br />
       <button onClick={() => handleRedirect('/admin/books/viewBooks')}>View Books</button>

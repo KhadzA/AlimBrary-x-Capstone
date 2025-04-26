@@ -1,38 +1,13 @@
 import { useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import Link from 'next/link';
+import { handleAddUser, handleChange } from '../../../helpers/adminUserHandler';
 import useCheckAuth from '../../../helpers/checkAuth';
 import { useRouter } from 'next/router';
-
-
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.withCredentials = true;
+import Link from 'next/link';
 
 export default function AddUser() {
     useCheckAuth();
     const router = useRouter();
     const [form, setForm] = useState({ name: '', email: '', password: '' });
-
-    const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleAddUser = async (e) => {
-        e.preventDefault();
-        try {
-        await axios.get('/sanctum/csrf-cookie');
-        await axios.post('/user', form, {
-            headers: {
-            'X-XSRF-TOKEN': decodeURIComponent(Cookies.get('XSRF-TOKEN')),
-            },
-        });
-        setForm({ name: '', email: '', password: '' });
-        alert('User added successfully!');
-        } catch (error) {
-        console.error('Failed to add user:', error.response?.data || error);
-        }
-    };
 
     const goHome = () => {
         router.push('/admin');
@@ -43,26 +18,26 @@ export default function AddUser() {
             <button onClick={goHome}>Home</button>
             <Link href="/admin/users/viewUsers">View Users</Link>
             <h1>Add User</h1>
-            <form onSubmit={handleAddUser}>
+            <form onSubmit={handleAddUser(form, setForm)}>
                 <input
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleChange}
+                    name="name"
+                    placeholder="Name"
+                    value={form.name}
+                    onChange={handleChange(setForm)}
                 />
                 <input
-                name="email"
-                placeholder="Email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
+                    name="email"
+                    placeholder="Email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange(setForm)}
                 />
                 <input
-                name="password"
-                placeholder="Password"
-                type="password"
-                value={form.password}
-                onChange={handleChange}
+                    name="password"
+                    placeholder="Password"
+                    type="password"
+                    value={form.password}
+                    onChange={handleChange(setForm)}
                 />
                 <button type="submit">Add User</button>
             </form>

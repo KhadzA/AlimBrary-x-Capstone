@@ -1,16 +1,8 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import Link from 'next/link';
-import Cookies from 'js-cookie';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import useCheckAuth from '../../../helpers/checkAuth';
-
-
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.withCredentials = true;
-
-// 🛡️ Set CSRF token from cookies into Axios headers
-axios.defaults.headers.common['X-XSRF-TOKEN'] = Cookies.get('XSRF-TOKEN');
+import { fetchBooks, deleteBook, updateBook } from '../../../helpers/adminBookHandler';
 
 export default function Books() {
   useCheckAuth();
@@ -21,20 +13,16 @@ export default function Books() {
 
   useEffect(() => {
     const init = async () => {
-      await axios.get('/sanctum/csrf-cookie');
-      fetchBooks();
+      const data = await fetchBooks();
+      setBooks(data);
     };
     init();
   }, []);
 
-  const fetchBooks = async () => {
-    const res = await axios.get('/book');
-    setBooks(res.data);
-  };
-
   const handleDelete = async (id) => {
-    await axios.delete(`/book/${id}`);
-    fetchBooks();
+    await deleteBook(id);
+    const data = await fetchBooks();
+    setBooks(data);
   };
 
   const handleEdit = (book) => {
@@ -47,9 +35,10 @@ export default function Books() {
   };
 
   const handleSave = async (id) => {
-    await axios.put(`/book/${id}`, editForm);
+    await updateBook(id, editForm);
     setEditingBookId(null);
-    fetchBooks();
+    const data = await fetchBooks();
+    setBooks(data);
   };
 
   const goHome = () => {

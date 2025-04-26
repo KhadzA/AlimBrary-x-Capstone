@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { fetchUsers, handleDelete, handleEdit, handleSave, handleEditChange } from '../../../helpers/adminUserHandler';
 import useCheckAuth from '../../../helpers/checkAuth';
 import { useRouter } from 'next/router';
-
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.withCredentials = true;
+import Link from 'next/link';
 
 export default function ViewUsers() {
     useCheckAuth();
@@ -17,63 +13,10 @@ export default function ViewUsers() {
 
     useEffect(() => {
         const init = async () => {
-        await axios.get('/sanctum/csrf-cookie');
-        fetchUsers();
+            await fetchUsers(setUsers);
         };
         init();
     }, []);
-
-    const fetchUsers = async () => {
-        try {
-            const res = await axios.get('/users');
-            console.log('Fetched users:', res.data);  
-            setUsers(Array.isArray(res.data) ? res.data : []);  
-        } catch (error) {
-            console.error('Failed to fetch users:', error);
-        }
-    };
-
-
-    const handleDelete = async (id) => {
-    try {
-        await axios.delete(`/user/${id}`, {
-        headers: {
-            'X-XSRF-TOKEN': decodeURIComponent(Cookies.get('XSRF-TOKEN'))
-        },
-        withCredentials: true
-        });
-        fetchUsers();
-    } catch (error) {
-        console.error('Failed to delete user:', error);
-    }
-    };
-
-    const handleEdit = (user) => {
-        setEditingUserId(user.id);
-        setEditForm({
-        name: user.name,
-        email: user.email,
-        password: '',
-        });
-    };
-
-    const handleSave = async (id) => {
-        try {
-        await axios.put(`/user/${id}`, editForm, {
-            headers: {
-            'X-XSRF-TOKEN': decodeURIComponent(Cookies.get('XSRF-TOKEN')),
-            },
-        });
-        setEditingUserId(null);
-        fetchUsers();
-        } catch (error) {
-        console.error('Failed to update user:', error);
-        }
-    };
-
-    const handleChange = (e) => {
-        setEditForm({ ...editForm, [e.target.name]: e.target.value });
-    };
 
     const goHome = () => {
         router.push('/admin');
@@ -86,36 +29,36 @@ export default function ViewUsers() {
             <h1>View Users</h1>
             <ul>
                 {users.map((user) => (
-                <li key={user.id}>
-                    {editingUserId === user.id ? (
-                    <>
-                        <input
-                        name="name"
-                        value={editForm.name}
-                        onChange={handleChange}
-                        />
-                        <input
-                        name="email"
-                        value={editForm.email}
-                        onChange={handleChange}
-                        />
-                        <input
-                        name="password"
-                        type="password"
-                        value={editForm.password}
-                        onChange={handleChange}
-                        />
-                        <button onClick={() => handleSave(user.id)}>Save</button>
-                    </>
-                    ) : (
-                    <>
-                        <strong>Name:</strong> {user.name} <br />
-                        <strong>Email:</strong> {user.email} <br />
-                        <button onClick={() => handleEdit(user)}>Edit</button>
-                        <button onClick={() => handleDelete(user.id)}>Delete</button>
-                    </>
-                    )}
-                </li>
+                    <li key={user.id}>
+                        {editingUserId === user.id ? (
+                            <>
+                                <input
+                                    name="name"
+                                    value={editForm.name}
+                                    onChange={handleEditChange(setEditForm)}
+                                />
+                                <input
+                                    name="email"
+                                    value={editForm.email}
+                                    onChange={handleEditChange(setEditForm)}
+                                />
+                                <input
+                                    name="password"
+                                    type="password"
+                                    value={editForm.password}
+                                    onChange={handleEditChange(setEditForm)}
+                                />
+                                <button onClick={() => handleSave(editForm, setEditingUserId, () => fetchUsers(setUsers))(user.id)}>Save</button>
+                            </>
+                        ) : (
+                            <>
+                                <strong>Name:</strong> {user.name} <br />
+                                <strong>Email:</strong> {user.email} <br />
+                                <button onClick={() => handleEdit(setEditingUserId, setEditForm)(user)}>Edit</button>
+                                <button onClick={() => handleDelete(() => fetchUsers(setUsers))(user.id)}>Delete</button>
+                            </>
+                        )}
+                    </li>
                 ))}
             </ul>
         </div>
