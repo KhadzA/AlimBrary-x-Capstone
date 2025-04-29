@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { checkAuthServer } from '@/helpers/checkAuth'; 
 import axios from 'axios';
-import handleLogout from '../auth/logout';
+import handleLogout from '@/pages/auth/logout';
 import AdminDashboardUI from '@/ui/admin/AdminDashboardUI';
 import LogoutModal from '@/ui/auth/LogoutModal';
 
@@ -19,14 +19,14 @@ export default function AdminDashboard() {
   };
 
   const LoadingLogout = async () => {
-    setIsLoggingOut(true);
+    setIsLoggingOut(true)
     try {
-      await handleLogout();
+      await handleLogout()
     } catch (error) {
-      console.error("Logout failed:", error);
-      setIsLoggingOut(false);
+      console.error("Logout failed:", error)
+      setIsLoggingOut(false)
     }
-  };
+  }
 
   return (
     <div>

@@ -6,26 +6,26 @@ const AddUserUI = ({ form, setForm, goHome, handleChange, handleAddUser }) => {
             <button onClick={goHome}>Home</button>
             <Link href="/admin/users/viewUsers">View Users</Link>
             <h1>Add User</h1>
-            <form onSubmit={handleAddUser(form, setForm)}>
+            <form onSubmit={handleAddUser}>
                 <input
                     name="name"
                     placeholder="Name"
                     value={form.name}
-                    onChange={handleChange(setForm)}
+                    onChange={handleChange}
                 />
                 <input
                     name="email"
                     placeholder="Email"
                     type="email"
                     value={form.email}
-                    onChange={handleChange(setForm)}
+                    onChange={handleChange}
                 />
                 <input
                     name="password"
                     placeholder="Password"
                     type="password"
                     value={form.password}
-                    onChange={handleChange(setForm)}
+                    onChange={handleChange}
                 />
                 <button type="submit">Add User</button>
             </form>

@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { checkAuthServer } from '@/helpers/checkAuth'; 
-import handleLogout from '@/auth/logout';
+import handleLogout from '@/pages/auth/logout';
 import UserDashboardUI from '@/ui/user/UserDashboardUI';
 import LogoutModal from '@/ui/auth/LogoutModal';
 
