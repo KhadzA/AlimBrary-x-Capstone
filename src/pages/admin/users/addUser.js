@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { handleAddUser, handleChange } from '../../../helpers/adminUserHandler';
-import useCheckAuth from '../../../helpers/checkAuth';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { checkAuthServer } from '@/helpers/checkAuth'; 
+import { handleAddUser, handleChange } from '@/helpers/adminUserHandler';
+import AddUserUI from '@/ui/admin/users/AddUserUI'; 
 
 export default function AddUser() {
-    useCheckAuth();
     const router = useRouter();
     const [form, setForm] = useState({ name: '', email: '', password: '' });
 
@@ -14,33 +13,27 @@ export default function AddUser() {
     };
 
     return (
-        <div>
-            <button onClick={goHome}>Home</button>
-            <Link href="/admin/users/viewUsers">View Users</Link>
-            <h1>Add User</h1>
-            <form onSubmit={handleAddUser(form, setForm)}>
-                <input
-                    name="name"
-                    placeholder="Name"
-                    value={form.name}
-                    onChange={handleChange(setForm)}
-                />
-                <input
-                    name="email"
-                    placeholder="Email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange(setForm)}
-                />
-                <input
-                    name="password"
-                    placeholder="Password"
-                    type="password"
-                    value={form.password}
-                    onChange={handleChange(setForm)}
-                />
-                <button type="submit">Add User</button>
-            </form>
-        </div>
+        <AddUserUI
+            form={form}
+            setForm={setForm}
+            goHome={goHome}
+            handleChange={handleChange}
+            handleAddUser={handleAddUser}
+        />
     );
+}
+
+export async function getServerSideProps(context) {
+  const auth = await checkAuthServer(context);
+
+  if (!auth.authenticated) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 }

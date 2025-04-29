@@ -6,14 +6,9 @@ axios.defaults.baseURL = 'http://localhost:8000';
 
 const handleLogout = async () => {
   try {
-    // 1. Fetch CSRF cookie
     await axios.get('/sanctum/csrf-cookie');
-
-    // 2. Get the token from cookies
     const csrfToken = Cookies.get('XSRF-TOKEN');
-    console.log('CSRF token used for logout:', csrfToken);
 
-    // 3. Send logout request with token
     await axios.post(
       '/logout',
       {},
@@ -23,6 +18,9 @@ const handleLogout = async () => {
         },
       }
     );
+
+    Cookies.remove('XSRF-TOKEN', { path: '/' });
+    Cookies.remove('laravel_session', { path: '/' });
 
     window.location.href = '/';
   } catch (error) {

@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import useCheckAuth from '../../../helpers/checkAuth';
-import { addBook } from '../../../helpers/adminBookHandler';
+import { checkAuthServer } from '@/helpers/checkAuth'; 
+import { addBook } from '@/helpers/adminBookHandler';
+import AddBookUI from '@/ui/admin/books/AddBookUI'; 
 
 export default function AddBook() {
-  useCheckAuth();
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [genre, setGenre] = useState('');
@@ -41,41 +40,32 @@ export default function AddBook() {
   };
 
   return (
-    <div>
-      <button onClick={goHome}>Home</button>
-      <h1>Add Book</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder='Title'
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <input
-          placeholder='Author'
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-        />
-        <input
-          placeholder='Genre'
-          value={genre}
-          onChange={(e) => setGenre(e.target.value)}
-        />
-        <label>Upload Image:</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={e => setImage(e.target.files[0])}
-        />
-        <label>Upload PDF:</label>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={e => setPDF(e.target.files[0])}
-        />
-        <button type="submit">Add Book</button>
-      </form>
-
-      <Link href="/admin/books/viewBooks">View Books</Link>
-    </div>
+    <AddBookUI
+      title={title}
+      author={author}
+      genre={genre}
+      setTitle={setTitle}
+      setAuthor={setAuthor}
+      setGenre={setGenre}
+      setImage={setImage}
+      setPDF={setPDF}
+      handleSubmit={handleSubmit}
+      goHome={goHome}
+    />
   );
+}
+
+export async function getServerSideProps(context) {
+  const auth = await checkAuthServer(context);
+
+  if (!auth.authenticated) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 }

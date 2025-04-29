@@ -1,22 +1,53 @@
 import { useRouter } from 'next/router';
-import handleLogout from '../auth/logout';
-import useCheckAuth from '../../../helpers/checkAuth';
+import { useState } from 'react';
+import { checkAuthServer } from '@/helpers/checkAuth'; 
+import handleLogout from '@/auth/logout';
+import UserDashboardUI from '@/ui/user/UserDashboardUI';
+import LogoutModal from '@/ui/auth/LogoutModal';
 
 export default function UserDashboard() {
-  useCheckAuth();
   const router = useRouter();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const LoadingLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await handleLogout()
+    } catch (error) {
+      console.error("Logout failed:", error)
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>User</h1>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        <button onClick={() => router.push('/user/books/viewBooks')}>
-          View Books
-        </button>
-        <button onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+    <div>
+      <UserDashboardUI
+        onViewBooks={() => router.push('/user/books/viewBooks')}
+        onOpenLogoutModal={() => setIsLogoutModalOpen(true)}
+      />
+
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={LoadingLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
+}
+
+export async function getServerSideProps(context) {
+  const auth = await checkAuthServer(context);
+
+  if (!auth.authenticated) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 }

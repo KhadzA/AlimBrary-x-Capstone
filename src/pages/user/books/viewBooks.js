@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { fetchBooks } from '../../../helpers/userBookHandler'; 
-import useCheckAuth from '../../../helpers/checkAuth'; 
+import { checkAuthServer } from '@/helpers/checkAuth'; 
+import { fetchBooks } from '@/helpers/userBookHandler';
+import useCheckAuth from '@/helpers/checkAuth';
+import ViewUserBooksUI from '@/ui/user/books/ViewBooksUI'; 
 
 export default function Books() {
   useCheckAuth();
@@ -17,39 +19,24 @@ export default function Books() {
   }, []);
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <button onClick={() => router.push('/user')}>Go Home</button>
-      <h1>Available Books</h1>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {books.map(book => (
-          <li key={book.id} style={{ marginBottom: '2rem' }}>
-            {book.image && (
-              <img
-                src={`http://localhost:8000/storage/books_image/${book.image}`}
-                alt={book.title}
-                style={{ width: '150px', height: 'auto' }}
-              />
-            )}
-            <div>
-              <strong>Title:</strong> {book.title}<br />
-              <strong>Author:</strong> {book.author}<br />
-              <strong>Genre:</strong> {book.genre}<br />
-              {book.pdf && (
-                <div>
-                  <strong>PDF:</strong>{' '}
-                  <a
-                    href={`http://localhost:8000/storage/books_pdf/${book.pdf}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {book.pdf}
-                  </a>
-                </div>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ViewUserBooksUI
+      books={books}
+      onGoHome={() => router.push('/user')}
+    />
   );
+}
+
+export async function getServerSideProps(context) {
+  const auth = await checkAuthServer(context);
+
+  if (!auth.authenticated) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 }

@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { fetchUsers, handleDelete, handleEdit, handleSave, handleEditChange } from '../../../helpers/adminUserHandler';
-import useCheckAuth from '../../../helpers/checkAuth';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
+import { checkAuthServer } from '@/helpers/checkAuth'; 
+import { fetchUsers, deleteUser, updateUser } from '@/helpers/adminUserHandler';
+import ViewUsersUI from '@/ui/admin/users/ViewUsersUI'; 
 
 export default function ViewUsers() {
-    useCheckAuth();
     const [users, setUsers] = useState([]);
     const [editingUserId, setEditingUserId] = useState(null);
     const [editForm, setEditForm] = useState({ name: '', email: '', password: '' });
@@ -13,54 +12,63 @@ export default function ViewUsers() {
 
     useEffect(() => {
         const init = async () => {
-            await fetchUsers(setUsers);
+            const data = await fetchUsers();
+            setUsers(data);
         };
         init();
     }, []);
+
+    const handleDelete = async (id) => {
+        await deleteUser(id);
+        const data = await fetchUsers();
+        setUsers(data);
+    };
+
+    const handleEdit = (user) => {
+        setEditingUserId(user.id);
+        setEditForm({
+            name: user.name,
+            email: user.email,
+            password: '', // Password intentionally blank
+        });
+    };
+
+    const handleSave = async (id) => {
+        await updateUser(id, editForm);
+        setEditingUserId(null);
+        const data = await fetchUsers();
+        setUsers(data);
+    };
 
     const goHome = () => {
         router.push('/admin');
     };
 
     return (
-        <div>
-            <button onClick={goHome}>Home</button>
-            <Link href="/admin/users/addUser">Add User</Link>
-            <h1>View Users</h1>
-            <ul>
-                {users.map((user) => (
-                    <li key={user.id}>
-                        {editingUserId === user.id ? (
-                            <>
-                                <input
-                                    name="name"
-                                    value={editForm.name}
-                                    onChange={handleEditChange(setEditForm)}
-                                />
-                                <input
-                                    name="email"
-                                    value={editForm.email}
-                                    onChange={handleEditChange(setEditForm)}
-                                />
-                                <input
-                                    name="password"
-                                    type="password"
-                                    value={editForm.password}
-                                    onChange={handleEditChange(setEditForm)}
-                                />
-                                <button onClick={() => handleSave(editForm, setEditingUserId, () => fetchUsers(setUsers))(user.id)}>Save</button>
-                            </>
-                        ) : (
-                            <>
-                                <strong>Name:</strong> {user.name} <br />
-                                <strong>Email:</strong> {user.email} <br />
-                                <button onClick={() => handleEdit(setEditingUserId, setEditForm)(user)}>Edit</button>
-                                <button onClick={() => handleDelete(() => fetchUsers(setUsers))(user.id)}>Delete</button>
-                            </>
-                        )}
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <ViewUsersUI
+            users={users}
+            editingUserId={editingUserId}
+            editForm={editForm}
+            setEditForm={setEditForm}
+            handleDelete={handleDelete}
+            handleEdit={handleEdit}
+            handleSave={handleSave}
+            goHome={goHome}
+        />
     );
+}
+
+export async function getServerSideProps(context) {
+    const auth = await checkAuthServer(context);
+
+    if (!auth.authenticated) {
+        return {
+            redirect: {
+                destination: '/auth/login',
+                permanent: false,
+            },
+        };
+    }
+
+    return { props: {} };
 }

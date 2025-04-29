@@ -1,41 +1,62 @@
 import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { checkAuthServer } from '@/helpers/checkAuth'; 
 import axios from 'axios';
 import handleLogout from '../auth/logout';
-import useCheckAuth from '../../helpers/checkAuth';
-
+import AdminDashboardUI from '@/ui/admin/AdminDashboardUI';
+import LogoutModal from '@/ui/auth/LogoutModal';
 
 axios.defaults.baseURL = 'http://localhost:8000';
 axios.defaults.withCredentials = true;
 
 export default function AdminDashboard() {
-  useCheckAuth();
   const router = useRouter();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleRedirect = (path) => {
     router.push(path);
   };
 
-  const handleLogoutClick = async () => {
+  const LoadingLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await handleLogout();
-      router.push('/auth/login');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
+      setIsLoggingOut(false);
     }
   };
 
   return (
     <div>
-      <h1>Admin</h1>
-      <button onClick={() => handleRedirect('/admin/books/addBook')}>Add Book</button>
-      <br /><br />
-      <button onClick={() => handleRedirect('/admin/books/viewBooks')}>View Books</button>
-      <br /><br />
-      <button onClick={() => handleRedirect('/admin/users/addUser')}>Add User</button>
-      <br /><br />
-      <button onClick={() => handleRedirect('/admin/users/viewUsers')}>View Users</button>
-      <br /><br />
-      <button onClick={handleLogoutClick}>Logout</button>
+      <AdminDashboardUI
+        onRedirect={handleRedirect}
+        onOpenLogoutModal={() => setIsLogoutModalOpen(true)}
+      />
+
+      <LogoutModal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={LoadingLogout}
+        isLoading={isLoggingOut}
+      />
     </div>
   );
+}
+
+
+export async function getServerSideProps(context) {
+  const auth = await checkAuthServer(context);
+
+  if (!auth.authenticated) {
+    return {
+      redirect: {
+        destination: '/auth/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 }

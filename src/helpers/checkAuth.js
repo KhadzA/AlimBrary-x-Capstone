@@ -1,21 +1,18 @@
-import { useEffect } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/router';
 
-export default function useCheckAuth() {
-    const router = useRouter();
-    
-    //This is where it authoorizes the users and check if they're logged in or not
-    useEffect(() => {
-        const checkAuth = async () => {
-        try {
-            await axios.get('/user'); 
-        } catch (error) {
-            console.error('Not authenticated, redirecting...');
-            router.push('/auth/login'); 
-        }
-        };
+export async function checkAuthServer(context) {
+  const { req } = context;
 
-        checkAuth();
-    }, [router]);
+  try {
+    await axios.get('http://localhost:8000/user', {
+      headers: {
+        Cookie: req.headers.cookie || '',
+      },
+      withCredentials: true,
+    });
+
+    return { authenticated: true };
+  } catch (error) {
+    return { authenticated: false };
+  }
 }
