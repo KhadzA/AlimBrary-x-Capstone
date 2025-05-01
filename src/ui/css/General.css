@@ -24,8 +24,65 @@
   display: inline-block;
 }
 
+/* Dark spinner for light backgrounds */
+.spinner-dark {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Navigation button with loading state */
+.nav-button.loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.nav-button.loading::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 0.8s linear infinite;
+}
+
+.add-button.loading::after {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+}
+
+/* Page transition overlay */
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.page-transition-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 0.25rem solid rgba(59, 130, 246, 0.1);
+  border-radius: 50%;
+  border-left-color: #3b82f6;
+  animation: spin 1s linear infinite;
 }

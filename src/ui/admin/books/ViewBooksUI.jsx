@@ -1,11 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import "@/ui/css/Books.css"
+import "@/ui/css/General.css"
 
 const ViewBooksUI = ({
     books,
     isLoading,
+    isMounted,
     editingBookId,
     editForm,
     setEditForm,
@@ -14,21 +17,55 @@ const ViewBooksUI = ({
     handleSave,
     goHome,
 }) => {
+    const [navLoading, setNavLoading] = useState(null)
+
+    const handleGoHome = () => {
+        setNavLoading("home")
+        goHome()
+    }
+
+    const handleAddBook = () => {
+        setNavLoading("add")
+    }
+
     return (
         <div className="books-container">
             <div className="books-header">
                 <h1>Books Collection</h1>
                 <div className="books-actions">
-                    <button onClick={goHome} className="nav-button">
-                        Back to Dashboard
+                    <button
+                        onClick={handleGoHome}
+                        className={`nav-button ${navLoading === "home" ? "loading" : ""}`}
+                        disabled={navLoading === "home"}
+                    >
+                        {navLoading === "home" ? (
+                            <span className="button-content">
+                                <span className="spinner-dark"></span>
+                                <span>Navigating...</span>
+                            </span>
+                        ) : (
+                            "Back to Dashboard"
+                        )}
                     </button>
-                    <Link href="/admin/books/addBook" className="nav-button add-button">
-                        Add New Book
+                    <Link
+                        href="/admin/books/addBook"
+                        className={`nav-button add-button ${navLoading === "add" ? "loading" : ""}`}
+                        onClick={() => handleAddBook()}
+                    >
+                        {navLoading === "add" ? (
+                            <span className="button-content">
+                                <span className="spinner"></span>
+                                <span>Navigating...</span>
+                            </span>
+                        ) : (
+                            "Add New Book"
+                        )}
                     </Link>
                 </div>
             </div>
 
-            {isLoading ? (
+            {/* Only show loading state if component has mounted on client */}
+            {isMounted && isLoading ? (
                 <div className="books-loading">
                     <div className="books-loading-spinner"></div>
                     <p>Loading books collection...</p>
@@ -36,8 +73,19 @@ const ViewBooksUI = ({
             ) : books.length === 0 ? (
                 <div className="empty-state">
                     <p>No books found in the collection.</p>
-                    <Link href="/admin/books/addBook" className="nav-button add-button">
-                        Add Your First Book
+                    <Link
+                        href="/admin/books/addBook"
+                        className={`nav-button add-button ${navLoading === "add" ? "loading" : ""}`}
+                        onClick={() => handleAddBook()}
+                    >
+                        {navLoading === "add" ? (
+                            <span className="button-content">
+                                <span className="spinner"></span>
+                                <span>Navigating...</span>
+                            </span>
+                        ) : (
+                            "Add Your First Book"
+                        )}
                     </Link>
                 </div>
             ) : (

@@ -5,10 +5,12 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import "@/ui/css/Dashboard.css"
 import "@/ui/css/Auth.css"
+import "@/ui/css/General.css"
 
 const AdminDashboardUI = ({ onRedirect, onOpenLogoutModal }) => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
     const [mobileVisible, setMobileVisible] = useState(false)
+    const [navLoading, setNavLoading] = useState(null)
     const router = useRouter()
 
     // Handle window resize for responsive behavior
@@ -37,6 +39,12 @@ const AdminDashboardUI = ({ onRedirect, onOpenLogoutModal }) => {
         } else {
             setSidebarCollapsed(!sidebarCollapsed)
         }
+    }
+
+    // Handle navigation with loading state
+    const handleNavigation = (path) => {
+        setNavLoading(path)
+        onRedirect(path)
     }
 
     // Navigation items
@@ -131,17 +139,26 @@ const AdminDashboardUI = ({ onRedirect, onOpenLogoutModal }) => {
                             <Link
                                 key={index}
                                 href={item.path}
-                                className={`nav-item ${item.active ? "active" : ""}`}
+                                className={`nav-item ${item.active ? "active" : ""} ${navLoading === item.path ? "loading" : ""}`}
                                 onClick={(e) => {
                                     e.preventDefault()
-                                    onRedirect(item.path)
+                                    handleNavigation(item.path)
                                     if (window.innerWidth < 768) {
                                         setMobileVisible(false)
                                     }
                                 }}
                             >
                                 <span className="nav-icon">{item.icon}</span>
-                                <span className="nav-text">{item.title}</span>
+                                <span className="nav-text">
+                                    {navLoading === item.path ? (
+                                        <span className="button-content">
+                                            <span className="spinner-dark"></span>
+                                            <span>Loading...</span>
+                                        </span>
+                                    ) : (
+                                        item.title
+                                    )}
+                                </span>
                             </Link>
                         ))}
 
@@ -150,7 +167,6 @@ const AdminDashboardUI = ({ onRedirect, onOpenLogoutModal }) => {
                             <div
                                 className="nav-item"
                                 onClick={() => {
-                                    console.log("Logout button clicked")
                                     onOpenLogoutModal()
                                 }}
                             >
