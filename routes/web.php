@@ -13,12 +13,7 @@ Route::middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/signup', [AuthController::class, 'signup']);
 
-    Route::post('/logout', function (Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return response()->json(['message' => 'Logged out']);
-    });
+Route::post('/logout', [AuthController::class, 'logout']);
 
     //Book Management
     Route::get('/book', [BooksController::class, 'index']);
