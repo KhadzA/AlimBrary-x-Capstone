@@ -6,7 +6,6 @@ import useCheckAuth from '@/helpers/checkAuth';
 import ViewUserBooksUI from '@/ui/user/books/ViewBooksUI'; 
 
 export default function Books() {
-  useCheckAuth();
   const [books, setBooks] = useState([]);
   const router = useRouter();
 

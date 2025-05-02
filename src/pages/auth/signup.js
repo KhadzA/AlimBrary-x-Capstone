@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
+import clearAuthCookies from '@/helpers/clearAuthCookies'
 import SignupForm from '@/ui/auth/SignupForm'; 
 import '@/ui/css/General.css'
 
@@ -14,6 +15,10 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter();
+
+  useEffect(() => {
+    clearAuthCookies()
+  }, [])
 
   const handleSignup = async (e) => {
     e.preventDefault();

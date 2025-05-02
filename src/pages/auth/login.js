@@ -1,10 +1,9 @@
-"use client"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/router"
 import Cookies from "js-cookie"
 import { checkRoleAndRedirect } from "@/helpers/checkRole"
+import clearAuthCookies from '@/helpers/clearAuthCookies'
 import LoginForm from "@/ui/auth/LoginForm"
 import "@/ui/css/General.css"
 
@@ -16,6 +15,10 @@ export default function Login() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    clearAuthCookies()
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -38,7 +41,6 @@ export default function Login() {
       checkRoleAndRedirect(router)
     } catch (err) {
       console.error(err)
-      // You could add error handling here to show an error message
     } finally {
       setIsLoading(false)
     }
